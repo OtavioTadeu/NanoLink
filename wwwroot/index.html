@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NanoLink | Encurtador de URL</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background-color: #2d2d2d;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 1.5rem;
+            color: #00d4ff;
+        }
+
+        input {
+            width: 80%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: #00d4ff;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+            button:hover {
+                transform: scale(1.05);
+            }
+
+        #resultado {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #383838;
+            border-radius: 8px;
+            display: none;
+            word-break: break-all;
+        }
+
+        a {
+            color: #00d4ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>NanoLink 🚀</h1>
+        <p>Cole seu link longo abaixo:</p>
+
+        <input type="text" id="urlInput" placeholder="Ex: https://www.linkedin.com/in/tadeu">
+        <br>
+        <button onclick="encurtarUrl()">Encurtar Agora</button>
+
+        <div id="resultado">
+            <p>Seu link curto:</p>
+            <a id="linkPronto" href="#" target="_blank">...</a>
+        </div>
+    </div>
+
+    <script>
+        async function encurtarUrl() {
+            const input = document.getElementById('urlInput');
+            const resultadoDiv = document.getElementById('resultado');
+            const linkPronto = document.getElementById('linkPronto');
+
+            const urlOriginal = input.value;
+
+            if (!urlOriginal) {
+                alert("Por favor, digite uma URL!");
+                return;
+            }
+
+            try {
+                const response = await fetch('/encurtar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: urlOriginal })
+                });
+
+                if (!response.ok) {
+                    alert("Erro ao encurtar. Verifique se a URL é válida (começa com http/https).");
+                    return;
+                }
+
+                const dados = await response.json();
+
+                linkPronto.href = dados.urlCurta;
+                linkPronto.innerText = dados.urlCurta;
+                resultadoDiv.style.display = 'block';
+
+            } catch (erro) {
+                console.error("Erro:", erro);
+                alert("Ocorreu um erro ao comunicar com o servidor.");
+            }
+        }
+    </script>
+</body>
+</html>
